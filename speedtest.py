@@ -45,12 +45,11 @@ def choose_server():
         server_lon = float(server[2])
         distance = sqrt(pow(server_lat - user_lat, 2) + pow(server_lon - user_lon, 2))
         bisect.insort_left(server_adrr_list, (distance, server[0]))
+    chosen_server = ''
     for server in server_adrr_list[:10]:
         if server_is_up(server[1]):
             chosen_server = server[1]
             return chosen_server
-        else:
-            continue
     if not chosen_server:
         logging.debug("Could not choose a server")
 
