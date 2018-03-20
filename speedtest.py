@@ -3,19 +3,31 @@
 import os
 import re
 import logging
-import requests
 import bisect
 
+try:
+    import requests
+except ImportError:
+    raise ImportError("'requests' library is required for running this program")
+
+from time import time
+from multiprocessing import Process, current_process, Manager
 from math import sqrt
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.debug('Start of program...')
+
+DOWNLOAD_FILES = [
+        '/speedtest/random350x350.jpg',
+        '/speedtest/random500x500.jpg',
+        '/speedtest/random1500x1500.jpg'
+    ]
 
 def server_is_up(server):
     hostname = server
     response = os.system('ping -c 1 ' + hostname)
+    # os.system('cls' if os.name == 'nt' else 'clear')
     if response == 0:
-        os.system('cls' if os.name == 'nt' else 'clear')
         return True
     else:
         return False
@@ -49,9 +61,34 @@ def choose_server():
     for server in server_adrr_list[:10]:
         if server_is_up(server[1]):
             chosen_server = server[1]
+            print(chosen_server)
             return chosen_server
     if not chosen_server:
         logging.debug("Could not choose a server")
 
+def download_process(file, return_list):
+    download = requests.get("http://" + host + file)
+    return_list.append(len(download.content))
+
+def download(host, runs):
+    total_downloaded = 0
+    start_time = time()
+    process_manager = Manager()
+    return_list = process_manager.list()
+    processes = []
+    for file in DOWNLOAD_FILES:
+        for process in range(runs):
+            process = Process(target=download_process, args=(file, return_list))
+            process.start()
+            processes.append(process)
+        for process in processes:
+            process.join()
+    total_downloaded = sum(return_list)
+    elapsed = (time() - start_time)
+    megabits = total_downloaded / (1 * pow(10, 6)) * 8
+    return megabits / elapsed
+
 if __name__ == '__main__':
-    choose_server()
+    host = choose_server()
+    runs = 3
+    download(host, runs)
