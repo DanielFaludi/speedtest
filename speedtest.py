@@ -140,7 +140,7 @@ def upload(host, runs):
     upload = sum(return_list)
     megabits = upload / (1 * pow(10, 6)) * 8
     speed = megabits / elapsed
-    logging.info("Upload speed: {} Mbits".format(round(speed, 2)))
+    logging.info("Upload speed: {} Mbps".format(round(speed, 2)))
     return speed
 
 
