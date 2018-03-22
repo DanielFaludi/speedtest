@@ -17,6 +17,7 @@ from time import time
 from multiprocessing import Process, Manager
 from math import sqrt
 from itertools import cycle
+from platform import system as system_name
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -29,12 +30,10 @@ DOWNLOAD_FILES = [
 def server_is_up(server):
     ''' Pings server, returns True if server is up '''
     hostname = server
+    param = '-n 1' if system_name().lower()=='windows' else '-c 1'
+    command = ['ping', param, hostname]
     try:
-        subprocess.check_output(
-            ['ping', '-c', '1', hostname],
-            stderr=subprocess.STDOUT,
-            universal_newlines=True
-        )
+        subprocess.check_output(command)
         return True
     except subprocess.CalledProcessError:
         return False
