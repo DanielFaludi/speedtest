@@ -72,6 +72,7 @@ def choose_server():
             return chosen_server
     if not chosen_server:
         logging.info("Could not choose a server")
+        sys.exit(1)
 
 def download_process(host, file, return_list):
     ''' Target for download processes '''
@@ -125,12 +126,12 @@ def upload(host, runs):
         processes.append(process)
     for process in processes:
         process.join()
-        elapsed = time() - start_time
-        upload = sum(return_list)
-        megabits = upload / (1 * pow(10, 6)) * 8
-        speed = megabits / elapsed
-        logging.info("Upload speed: {} Mbps".format(round(speed, 2)))
-        return speed
+    elapsed = time() - start_time
+    upload = sum(return_list)
+    megabits = upload / (1 * pow(10, 6)) * 8
+    speed = megabits / elapsed
+    logging.info("Upload speed: {} Mbps".format(round(speed, 2)))
+    return speed
 
 def rand_string(size):
     ''' Generates a random string based on size (in Bytes) '''
